@@ -69,7 +69,7 @@ module.exports = {
                 songquery = songquery +" "+args[i];
             }
             const result = await player.search(songquery,{requestedBy: msg.author, searchEngine:"youtube"});
-            
+            console.log(result.tracks[0])
             await player.play(voiceChannel, result, {
                  nodeOptions: {
                   metadata: {
@@ -120,7 +120,7 @@ module.exports = {
         //If the user has used the remove from queue command
         if(args[0] === 'remove' || args[0] === 'r'){
             const trackNumber = args[1];
-            if (trackNumber <= 0) return
+            if (!trackNumber.match(/^\d{1,}$/)||trackNumber <= 0) return
             const queue = useQueue(msg.guild.id);
             const tracks = queue.tracks.toArray()
             if(tracks.length < trackNumber) return
