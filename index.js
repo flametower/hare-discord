@@ -17,7 +17,7 @@ client.player = new Player(client, {
     }
 })
 
-const prefix = "!hare"
+const prefix = "hare"
 
 const fs = require('fs');
 
@@ -37,20 +37,24 @@ client.on("messageCreate", async (msg) => {
     if(!msg.content.startsWith(prefix) || msg.author.bot) return
 
     const args = msg.content.slice(prefix.length+1).split(/ +/);
-    const command = client.commands.get(args[0])
+    const command = client.commands.get(args[0]) || client.commands.find(cmd => cmd.alias === args[0]);
     if (args[0] === "help" || args[0] === "h"){
         var commandListString = `\`help\` or \`h\` - This command\n`
         client.commands.forEach(element => {
-            commandListString = commandListString + `\`${element.name}\` - ${element.desc}\n`
+            if (element.name === "call") {
+                commandListString = commandListString + `\`${element.name}\`- ${element.desc}\n`
+            } else {
+                commandListString = commandListString + `\`${element.name}\` or \`${element.alias}\` - ${element.desc}\n`
+            }
         });
         const listEmbed = new Discord.EmbedBuilder()
                 .setTitle(`**Command List**`)
                 .setDescription(commandListString)
             return msg.channel.send({ embeds: [listEmbed] });
-        /* return msg.channel.send('DEV MASIH MALES KASIH DOKUMENTASHIT SAMA HELP\n\n "sabar anjir beresin dlu fiturnya" -F'); */
     }
     args.shift().toLowerCase();
     if (command) command.execute(client,msg,args)
+    else return msg.channel.send("Use `hare help` to access commands available");
     /* if (msg.author.username === "FlameTower") {
       msg.reply("i schleep");
     } */

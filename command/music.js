@@ -3,7 +3,8 @@ const { EmbedBuilder, MessageEmbed } = require("discord.js")
 
 module.exports = {
     name:'music',
-    desc:'music player, for more info use \`!hare music help\`',
+    alias: 'm',
+    desc:'music player, for more info use \`hare music help\`',
     subcommands: 
         [
             {
@@ -63,37 +64,41 @@ module.exports = {
         
         //If the user has used the play command
         if (args[0] === 'play' || args[0] === 'p'){
-            let songquery = ""
+            let songQuery = ""
             if(args.length < 2) return
             for(i = 1; i < args.length; i++){
-                songquery = songquery +" "+args[i];
+                songQuery = songQuery +" "+args[i];
             }
-            const result = await player.search(songquery,{requestedBy: msg.author, searchEngine:"youtube"});
-            console.log(result.tracks[0])
-            await player.play(voiceChannel, result, {
-                 nodeOptions: {
-                  metadata: {
-                   channel: voiceChannel,
-                   client: msg.author,
-                   requestedBy: msg.author,
-                  },
-                  selfDeaf: true,
-                  volume: 80,
-                  leaveOnEmpty: true,
-                  leaveOnEmptyCooldown: 300000,
-                  leaveOnEnd: true,
-                  leaveOnEndCooldown: 300000,
-                 }
-                });
-            const currentTrack = result.tracks[0]
-            const currentEmbed = new EmbedBuilder()
-                .setDescription(`**[${currentTrack.title}](${currentTrack.url})** has been added to the Queue`)
-                .setThumbnail(currentTrack.raw.thumbnail.url)
-            return msg.channel.send({ embeds: [currentEmbed] });
+            const result = await player.search(songQuery,{requestedBy: msg.author, searchEngine:"youtube"});
+            // console.log(result.tracks[0])
+            try {
+                await player.play(voiceChannel, result, {
+                     nodeOptions: {
+                      metadata: {
+                       channel: voiceChannel,
+                       client: msg.author,
+                       requestedBy: msg.author,
+                      },
+                      selfDeaf: true,
+                      volume: 80,
+                      leaveOnEmpty: true,
+                      leaveOnEmptyCooldown: 300000,
+                      leaveOnEnd: true,
+                      leaveOnEndCooldown: 300000,
+                     }
+                    });
+                const currentTrack = result.tracks[0]
+                const currentEmbed = new EmbedBuilder()
+                    .setDescription(`**[${currentTrack.title}](${currentTrack.url})** has been added to the Queue`)
+                    .setThumbnail(currentTrack.raw.thumbnail.url)
+                return msg.channel.send({ embeds: [currentEmbed] });
+            } catch (error) {
+                return msg.channel.send("Audio Error, video probably restricted");
+            }
         }
         
         //If the user has used the disconnect command
-        if(args[0] === 'disconnect' || args[0] === 'd'){
+        else if(args[0] === 'disconnect' || args[0] === 'd'){
             const queue = useQueue(msg.guild.id);
             if (!queue) return;
             // Deletes all the songs from the queue and exits the channel
@@ -102,7 +107,7 @@ module.exports = {
         }
 
         //If the user has used the skip command
-        if(args[0] === 'skip' || args[0] === 's'){
+        else if(args[0] === 'skip' || args[0] === 's'){
             const queue = useQueue(msg.guild.id);
             if (queue.tracks.toArray().length <= 0) return msg.channel.send("There are no songs in the queue");
             queue.node.skip()
@@ -110,7 +115,7 @@ module.exports = {
         }
 
         //If the user has used the pause/resume command
-        if(args[0] === 'pause' || args[0] === 'g'){
+        else if(args[0] === 'pause' || args[0] === 'g'){
             const queue = useQueue(msg.guild.id);
             if (!queue.currentTrack) return msg.channel.send("No music being played");
             queue.node.setPaused(!queue.node.isPaused());//isPaused() returns true if that player is already paused
@@ -118,7 +123,7 @@ module.exports = {
         }
 
         //If the user has used the remove from queue command
-        if(args[0] === 'remove' || args[0] === 'r'){
+        else if(args[0] === 'remove' || args[0] === 'r'){
             const trackNumber = args[1];
             if (!trackNumber.match(/^\d{1,}$/)||trackNumber <= 0) return
             const queue = useQueue(msg.guild.id);
@@ -130,7 +135,7 @@ module.exports = {
         }
 
         //If the user has used the queue command
-        if(args[0] === 'queue' || args[0] === 'q'){
+        else if(args[0] === 'queue' || args[0] === 'q'){
             const queue = useQueue(msg.guild.id);
             const tracks = queue.tracks.toArray(); //Converts the queue into a array of tracks
             const currentTrack = queue.currentTrack; //Gets the current track being played
@@ -150,5 +155,6 @@ module.exports = {
                     .setThumbnail(currentTrack.raw.thumbnail.url)
             return msg.channel.send({ embeds: [queueEmbed] });
         }
+        else return msg.channel.send("Use `hare (music||m) (help||h)` to access commands available");
     }
 }
