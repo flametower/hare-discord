@@ -20,12 +20,11 @@ client.player = new Player(client, {
 const prefix = "hare"
 
 const fs = require('fs');
-
+const commandDirectory = __dirname+'/command/';
 client.commands = new Discord.Collection();
-
-const commandFiles = fs.readdirSync('./command/').filter(file => file.endsWith('.js'))
+const commandFiles = fs.readdirSync(commandDirectory).filter(file => file.endsWith('.js'))
 for(const file of commandFiles){
-    const command = require(`./command/${file}`)
+    const command = require(commandDirectory+file)
     client.commands.set(command.name,command);
 }
 
@@ -61,5 +60,5 @@ client.on("messageCreate", async (msg) => {
   })
 
 client.login(
-    "MTA5MTk1OTg0Nzc4NTg3NzUwNA.G4_RjG.ubLWBqFYCuU2o2Nt8mo99Q5kxUMzw0K1kVu24U"
+    process.env.LOGIN_TOKEN
 );

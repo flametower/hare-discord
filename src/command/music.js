@@ -69,7 +69,10 @@ module.exports = {
             for(i = 1; i < args.length; i++){
                 songQuery = songQuery +" "+args[i];
             }
-            const result = await player.search(songQuery,{requestedBy: msg.author, searchEngine:"youtube"});
+            const result = await player.search(songQuery,{
+                requestedBy: msg.author,
+                searchEngine:"youtube"
+            });
             // console.log(result.tracks[0])
             try {
                 await player.play(voiceChannel, result, {
