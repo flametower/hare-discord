@@ -1,3 +1,4 @@
+require('dotenv').config();
 const Discord = require('discord.js');
 const { Player } = require("discord-player")
 const client = new Discord.Client({
@@ -58,7 +59,6 @@ client.on("messageCreate", async (msg) => {
       msg.reply("i schleep");
     } */
   })
-
 client.login(
     process.env.LOGIN_TOKEN
 );
